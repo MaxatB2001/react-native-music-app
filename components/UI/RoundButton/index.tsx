@@ -11,6 +11,7 @@ export type RoundButtonProps = {
 export enum RoundButtonStyle {
   yellow = 'yellow',
   transparent = 'transparent',
+  white = 'white'
 }
 
 const RoundButton: FC<RoundButtonProps> = ({icon, buttonStyle, onPress}) => {  

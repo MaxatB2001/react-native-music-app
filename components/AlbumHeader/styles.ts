@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   buttons: {
-    width: '60%',
+    width: '80%',
     flexDirection: 'row',
     justifyContent: 'space-evenly'
   }

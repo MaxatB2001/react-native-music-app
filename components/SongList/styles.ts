@@ -2,7 +2,11 @@ import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 60
+   
+  },
+  title: {
+    color:'white',
+    alignItems: 'center'
   }
 });
 

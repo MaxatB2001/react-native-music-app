@@ -6,7 +6,7 @@ import styles from './styles';
 
 export type SongListProps = {
   songs: Array<Song>;
-  header?: FC;
+  header?: FC | JSX.Element;
 }
 
 const SongList: FC<SongListProps> = ({songs, header}) => {
@@ -14,7 +14,7 @@ const SongList: FC<SongListProps> = ({songs, header}) => {
     <FlatList
         style={styles.container}
         data={songs}
-        renderItem={({item}) => <SongListItem song={item}/>}
+        renderItem={({item, index}) => <SongListItem song={item} songs={songs} index={index}/>}
         keyExtractor={item => item._id}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={header}

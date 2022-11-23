@@ -2,6 +2,7 @@ import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
+    // display: 'none',
     position: 'absolute',
     bottom: 49,
     backgroundColor: '#131313',

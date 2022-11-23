@@ -1,82 +1,90 @@
-import React, {FC, useContext, useEffect, useState} from 'react'
-import {Song} from '../../types'
+import React, {FC, useEffect, useState} from 'react'
 import {View, Text, Image, TouchableOpacity} from 'react-native';
 import styles from './styles';
-import { EvilIcons, Foundation   } from '@expo/vector-icons';
-import { AVPlaybackStatus } from 'expo-av';
+import { AntDesign, Foundation } from '@expo/vector-icons';
 import { Sound } from 'expo-av/build/Audio';
-import { AppContext } from '../../AppContext';
 import { BASE_URL } from '../../constants/consants';
+import { useTypedSelector } from '../../hooks/useTypedSelector';
+import { useActions } from '../../hooks/useActions';
+import { dislikeSong, likeSong } from '../../api/SongApi';
 
 const PlayerWidget: FC = () => {
-
-  console.log('rendeed');
-  const [sound, setSound] = useState<Sound|null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [duration, setDuration] = useState<number|null>(null);
-  const [position, setPosition] = useState<number|null>(null);
-
-  const {setShowPlayer} = useContext(AppContext);
-
-  const value = useContext(AppContext)
+  const { active, currentTime, duration, soundObj, isPlaying } = useTypedSelector(
+    (state) => state.playerReducer
+  );
+  const user = useTypedSelector(state => state.userReducer.user)
+  const { setShowPlayer, setCurrentTime, setSoundObj, setDuration, setIsPlaying, setLikedSong, removeFromLikedSong } = useActions();
 
   const onPlaybackStatusUpdate = (status: any) => {
-    
     setIsPlaying(status.isPlaying);
     setDuration(status.durationMillis);
-    setPosition(status.positionMillis);
+    setCurrentTime(status.positionMillis);
   }
 
   const getSongProgress = () => {
-    if (sound === null || duration === null || position === null) {
+    if (soundObj === null || duration === null || currentTime === null) {
       return 0;
     } 
 
-    return (position / duration) * 100;
+    return (currentTime / duration) * 100;
   }
-  
+
+  const addLikedSong = () => {
+    likeSong(active?._id as string)
+    setLikedSong(active?._id as string)
+  }
+
+  const removeLikedSong = () => {
+    dislikeSong(active?._id as string)
+    removeFromLikedSong(active?._id as string)
+  }
+
   const playCurrentSong = async () => {
 
-    if (sound) {
-      await sound.unloadAsync();
+    if (soundObj) {
+      await soundObj.unloadAsync();
     }
     
     const {sound: newSound} = await Sound.createAsync(
-      {uri: `${BASE_URL}/` + value.song.audio},
+      {uri: `${BASE_URL}/` + active?.audio},
       {shouldPlay: true},
       onPlaybackStatusUpdate
     )
-    setSound(newSound)
+    setSoundObj(newSound)
   }
 
   const onPlayPausePress = async () => {
-    if (!sound) {
+    if (!soundObj) {
       return;
     }
     if (isPlaying) {
-      await sound.pauseAsync();
+      await soundObj.pauseAsync();
     } else {
-      await sound.playAsync();
+      await soundObj.playAsync();
     }
   }
 
   useEffect(() => {
     playCurrentSong();
-  }, [value.song])
+  }, [active])
+
+  if (!active) {
+    return null
+  }
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => setShowPlayer(true)}>
       <View style={[styles.progress, {width: `${getSongProgress()}%`}]}></View>
       <View style={styles.row}>
-        <Image style={styles.image} source={{uri: `${BASE_URL}/` + value.song.picture}}/>
+        <Image style={styles.image} source={{uri: `${BASE_URL}/` + active?.picture}}/>
         <View style={styles.rightContainer}>
           <View style={styles.nameContainer}>
-            <Text style={styles.title}>{value.song.name}</Text>
-            <Text style={styles.artist}>{value.song.artist}</Text>
+            <Text style={styles.title}>{active?.name}</Text>
+            <Text style={styles.artist}>{active?.artist.name}</Text>
           </View>
           <View style={styles.icons}>
-            <EvilIcons name='heart' size={30} color='white'/>
+            {user?.likedTracks.includes(active._id) ? <AntDesign onPress={removeLikedSong} name="heart" size={24} color="#ffdb4d" /> : <AntDesign onPress={addLikedSong} name="hearto" size={24} color="white" />}
             <TouchableOpacity onPress={onPlayPausePress}>
               <Foundation name={isPlaying ? "pause" : "play"} size={30} color="white" />
             </TouchableOpacity>

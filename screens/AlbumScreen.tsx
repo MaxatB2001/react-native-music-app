@@ -1,33 +1,24 @@
 import { useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import {View, Text, FlatList} from 'react-native';
-import { getSongs } from '../api/SongApi';
+import {View} from 'react-native';
+import { getAlbum, getSongs } from '../api/SongApi';
 import AlbumHeader from '../components/AlbumHeader';
 import SongList from '../components/SongList';
+import { AlbumType } from '../types';
 
-const AlbumScreen = () => {
-
+const AlbumScreen = () => { 
   const route = useRoute();
-  const [songs, setSongs] = useState([])
+  const [album, setAlbum] = useState<AlbumType | null>(null)
 
   useEffect(() => {
-    getSongs().then(songs => setSongs(songs));
+    getAlbum(route.params?.id).then(data => setAlbum(data));
   }, []);
 
-  const album = {
-    id: '1',
-    imageUri: 'https://i1.sndcdn.com/artworks-000527526030-oeg5io-t500x500.jpg',
-    artist: 'King Gnu',
-    name: 'Sympha',
-    numberOfLikes: 291210,
-    songs: [
-    
-    ]
-  }
+  if (album == null) return null;
 
   return (
     <View>
-      <SongList songs={songs} header={() => <AlbumHeader album={album}/>}/>
+      <SongList songs={album.tracks} header={() => <AlbumHeader album={album}/>}/>
     </View>
   )
 }

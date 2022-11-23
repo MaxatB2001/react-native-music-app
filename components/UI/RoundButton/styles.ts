@@ -13,6 +13,9 @@ const styles = StyleSheet.create({
   },
   transparent: {
     backgroundColor: 'rgba(52, 52, 52, 0.8)',
+  },
+  white: {
+    backgroundColor: 'white'
   }
 })
 

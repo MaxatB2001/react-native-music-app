@@ -16,7 +16,7 @@ const AlbumCategory = (props: AlbumCategoryProps) => {
       <FlatList 
         data={props.albums}
         renderItem={({item}) => <Album album={item}/>}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item._id}
         horizontal
         showsHorizontalScrollIndicator={false}
       />
